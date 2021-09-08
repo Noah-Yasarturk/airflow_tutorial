@@ -17,7 +17,7 @@ my_args = {
 with DAG(
     dag_id='my_xcom_push',
     default_args = my_args,
-    description = 'Here I will push a list to pull elsewere',
+    description = 'Here I will push a string to pull elsewere',
     schedule_interval = timedelta(days=1),
     start_date = days_ago(1),
     tags = ['custom']

@@ -1,9 +1,12 @@
-from airflow import DAG
 from datetime import timedelta
+from textwrap import dedent
+from airflow import DAG
 from airflow.utils.dates import days_ago 
-from airflow.operators.mysql_operator import MySqlOperator as BaseMySqlOperator
 from airflow.hooks.mysql_hook import MySqlHook
+from airflow.operators.mysql_operator import MySqlOperator as BaseMySqlOperator
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
+from airflow.operators.python_operator import BranchPythonOperator
 
 
 my_args = {
@@ -13,7 +16,7 @@ my_args = {
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=2)
+    'retry_delay': timedelta(minutes=1)
 }
 
 # Dag definition
@@ -47,6 +50,17 @@ with DAG(
         print(string_out)
         return string_out
 
+
+    def branch_logic(ti):
+        ''' Pulls results from our SQL query, routing where appropriate
+        '''
+        xcom_value = int(ti.xcom_pull(task_ids='query_task')[0])
+        print('Pulled this value from query_task: {}'.format(str(xcom_value)))
+        if xcom_value >= 5:
+            return 'proceed_bash'
+        else:
+            return 'sleep_bash'
+
     # Connect & query
     mysql_task = ReturningMySqlOperator(
         task_id = 'query_task',
@@ -55,23 +69,46 @@ with DAG(
         # do_xcom_push=True # MySqlOperator does not support do_xcom_push
     )
 
-    # Results will be in xcom. Pull them
+    # Results will be in xcom. Pull them & print them 
     printable_task = PythonOperator(
         task_id = 'print_records',
         python_callable=print_records
     )
 
-    printable_task.doc_md = ''' In this case, 
-    printable_task printed no records.
-    Airflow is an orchestration tool, not a data manipulation
-    tool. The work should be done by the files it executes.
-    It is not like Apache NiFi in this regard.
+    branch_task = BranchPythonOperator(
+        task_id = 'branch_on_record_size',
+        python_callable = branch_logic
+    )
 
-    Data is not to be passed between tasks. Tasks are atomic. 
-    How then should we do conditional logic?? Next branch.
+    templated_command = dedent(
+    """
+    {% for i in range(5) %}
+        echo "{{ ds }} Good to go!!"
+    {% endfor %}
+    """
+    )
+
+    templated_command_2 = dedent(
+        """
+        echo "Not enough data! Going to sleep ..."
+        sleep 5
+        """
+    )
+
+    proceed_task = BashOperator(
+        task_id ='proceed_bash',
+        bash_command=templated_command
+    )
+
+    stop_task = BashOperator(
+        task_id = 'sleep_bash',
+        bash_command= templated_command_2
+    )
+
+    printable_task.doc_md = ''' 
     '''
 
-    mysql_task >> printable_task
+    mysql_task >> printable_task >> branch_task >> [proceed_task,stop_task]
 
 
     

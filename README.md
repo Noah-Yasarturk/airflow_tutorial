@@ -4,3 +4,10 @@ Testing Apache Airflow DAGS. Data and logs excluded. Docker file included. This 
 
 
 The DAGs are under airflow/dags
+
+Concepts covered thus far:
+- DAGS, tasks, Operators, documentation
+- Querying SQL data
+- Conditional branching
+- Subdags
+- Xcoms (pull, push)

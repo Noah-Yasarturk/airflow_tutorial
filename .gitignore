@@ -1,2 +1,4 @@
 data
 airflow/logs
+airflow/sens.txt
+airflow/dags/__pycache__

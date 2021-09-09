@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.utils.task_group import TaskGroup
 from airflow.utils.dates import days_ago
 from airflow.operators.dummy import DummyOperator
+from airflow.utils.edgemodifier import Label
 
 # Torn straight from https://airflow.apache.org/docs/apache-airflow/stable/concepts/dags.html#concepts-taskgroups
 
@@ -20,7 +21,7 @@ with DAG(
     task3 = DummyOperator(task_id="task3")
 
     # task1 and task2 become upstream of task3 because both are grouped together here
-    group1 >> task3
+    group1 >> Label('After the group1 TaskGroup succeeds') >>  task3
 
     '''
     Other than cleanliness/UI, how is this different than lists ??

@@ -9,7 +9,8 @@ The DAGs are under airflow/dags
 Concepts covered thus far:
 - DAGS, tasks, Operators, documentation
 - Querying SQL data
-- Conditional branching
+- Conditional branching - on_success/failure_callback based and BranchPythonOperator based
 - Subdags
 - Xcoms (pull, push)
-- UI - Labelling edges, Task Groups
+- UI - Labelling edges, Task Groups, tagging
+- Jinja & templating

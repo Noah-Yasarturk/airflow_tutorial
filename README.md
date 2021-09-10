@@ -1,6 +1,7 @@
 # airflow_tutorial
-Testing Apache Airflow DAGS. 
-Testing Apache Airflow DAGS. Data and logs excluded. Docker file included. This guide was my guide: https://medium.com/@ayoub10hamaoui/how-to-run-airflow-on-windows-with-docker-part-2-f5024e8f8a21
+Following along with the Apache Airflow tutorial and implementing my own versions to test understanding of Apache Airflow concepts.
+ Data and logs excluded. Docker file included. This guide was my guide to the initial installation: https://medium.com/@ayoub10hamaoui/how-to-run-airflow-on-windows-with-docker-part-2-f5024e8f8a21
+ From there I used the Apache Airflow documentatation to facilitate learning, starting with the Architecture Overview and branching off as appropriate: https://airflow.apache.org/docs/apache-airflow/stable/index.html
 
 
 The DAGs are under airflow/dags
@@ -11,3 +12,4 @@ Concepts covered thus far:
 - Conditional branching
 - Subdags
 - Xcoms (pull, push)
+- UI - Labelling edges, Task Groups
